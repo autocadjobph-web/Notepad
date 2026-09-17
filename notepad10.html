@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Web Notepad</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+*, *::before, *::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: currentColor; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; tab-size: 4; }
+html, body { height: 100%; }
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, h5, h6, p { margin: 0; font-size: inherit; font-weight: inherit; }
+button, input, textarea, select {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+}
+button { cursor: pointer; }
+select { appearance: auto; -webkit-appearance: auto; }
+
+.code-font { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
+
+textarea { tab-size: 4; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+:root { color-scheme: light; }
+html.dark { color-scheme: dark; }
+.-translate-x-full { transform: translateX(-100%); }
+.absolute { position: absolute; }
+.active\:scale-95:active { transform: scale(0.95); }
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.backdrop-blur-xs { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.bg-amber-500 { background-color: rgb(245, 158, 11); }
+.bg-blue-100 { background-color: rgb(219, 234, 254); }
+.bg-blue-50 { background-color: rgb(239, 246, 255); }
+.bg-emerald-50 { background-color: rgb(236, 253, 245); }
+.bg-primary { background-color: #3b82f6; }
+.bg-purple-50 { background-color: rgb(250, 245, 255); }
+.bg-slate-100 { background-color: rgb(241, 245, 249); }
+.bg-slate-200 { background-color: rgb(226, 232, 240); }
+.bg-slate-300 { background-color: rgb(203, 213, 225); }
+.bg-slate-50 { background-color: rgb(248, 250, 252); }
+.bg-slate-900\/50 { background-color: rgba(15, 23, 42, 0.5); }
+.bg-slate-900\/60 { background-color: rgba(15, 23, 42, 0.6); }
+.bg-transparent { background-color: transparent; }
+.bg-white { background-color: #ffffff; }
+.block { display: block; }
+.border { border-width: 1px; border-style: solid; }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; }
+.border-none { border-style: none; }
+.border-r { border-right-width: 1px; border-right-style: solid; }
+.border-slate-200 { border-color: rgb(226, 232, 240); }
+.border-slate-300 { border-color: rgb(203, 213, 225); }
+.border-t { border-top-width: 1px; border-top-style: solid; }
+.cursor-pointer { cursor: pointer; }
+.dark .dark\:bg-blue-900\/30 { background-color: rgba(30, 58, 138, 0.3); }
+.dark .dark\:bg-blue-900\/40 { background-color: rgba(30, 58, 138, 0.4); }
+.dark .dark\:bg-blue-900\/50 { background-color: rgba(30, 58, 138, 0.5); }
+.dark .dark\:bg-emerald-900\/30 { background-color: rgba(6, 78, 59, 0.3); }
+.dark .dark\:bg-primary { background-color: #3b82f6; }
+.dark .dark\:bg-purple-900\/40 { background-color: rgba(88, 28, 135, 0.4); }
+.dark .dark\:bg-slate-700 { background-color: rgb(51, 65, 85); }
+.dark .dark\:bg-slate-800 { background-color: rgb(30, 41, 59); }
+.dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5); }
+.dark .dark\:bg-slate-800\/60 { background-color: rgba(30, 41, 59, 0.6); }
+.dark .dark\:bg-slate-800\/80 { background-color: rgba(30, 41, 59, 0.8); }
+.dark .dark\:bg-slate-900 { background-color: rgb(15, 23, 42); }
+.dark .dark\:border-slate-600 { border-color: rgb(71, 85, 105); }
+.dark .dark\:border-slate-700 { border-color: rgb(51, 65, 85); }
+.dark .dark\:divide-slate-700\/50 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(51, 65, 85, 0.5); }
+.dark .dark\:hover\:bg-blue-900\/60:hover { background-color: rgba(30, 58, 138, 0.6); }
+.dark .dark\:hover\:bg-emerald-900\/50:hover { background-color: rgba(6, 78, 59, 0.5); }
+.dark .dark\:hover\:bg-purple-900\/60:hover { background-color: rgba(88, 28, 135, 0.6); }
+.dark .dark\:hover\:bg-slate-600:hover { background-color: rgb(71, 85, 105); }
+.dark .dark\:hover\:bg-slate-700:hover { background-color: rgb(51, 65, 85); }
+.dark .dark\:text-blue-400 { color: rgb(96, 165, 250); }
+.dark .dark\:text-emerald-400 { color: rgb(52, 211, 153); }
+.dark .dark\:text-purple-400 { color: rgb(192, 132, 252); }
+.dark .dark\:text-slate-100 { color: rgb(241, 245, 249); }
+.dark .dark\:text-slate-200 { color: rgb(226, 232, 240); }
+.dark .dark\:text-slate-300 { color: rgb(203, 213, 225); }
+.dark .dark\:text-slate-400 { color: rgb(148, 163, 184); }
+.dark .dark\:text-slate-500 { color: rgb(100, 116, 139); }
+.dark .dark\:translate-x-4 { transform: translateX(1rem); }
+.divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(241, 245, 249); }
+.divide-y > :not([hidden]) ~ :not([hidden]) { border-top-width: 1px; border-top-style: solid; }
+.duration-200 { transition-duration: 200ms; }
+.duration-300 { transition-duration: 300ms; }
+.ease-in-out { transition-timing-function: cubic-bezier(0.4,0,0.2,1); }
+.fixed { position: fixed; }
+.flex { display: flex; }
+.flex-1 { flex: 1 1 0%; }
+.flex-col { flex-direction: column; }
+.focus\:outline-none:focus { outline: none; }
+.focus\:ring-2:focus, .focus\:ring-primary:focus { box-shadow: 0 0 0 2px #3b82f6; outline: none; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.gap-1 { gap: 0.25rem; }
+.gap-1\.5 { gap: 0.375rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.h-10 { height: 2.5rem; }
+.h-2 { height: 0.5rem; }
+.h-4 { height: 1rem; }
+.h-6 { height: 1.5rem; }
+.h-full { height: 100%; }
+.hidden { display: none; }
+.hover\:bg-blue-100:hover { background-color: rgb(219, 234, 254); }
+.hover\:bg-blue-600:hover { background-color: rgb(37, 99, 235); }
+.hover\:bg-emerald-100:hover { background-color: rgb(209, 250, 229); }
+.hover\:bg-purple-100:hover { background-color: rgb(243, 232, 255); }
+.hover\:bg-slate-100:hover { background-color: rgb(241, 245, 249); }
+.hover\:bg-slate-200:hover { background-color: rgb(226, 232, 240); }
+.hover\:bg-slate-300:hover { background-color: rgb(203, 213, 225); }
+.hover\:text-primary:hover { color: #3b82f6; }
+.hover\:text-red-500:hover { color: rgb(239, 68, 68); }
+.hover\:underline:hover { text-decoration: underline; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.inset-y-0 { top: 0; bottom: 0; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.leading-relaxed { line-height: 1.625; }
+.left-0 { left: 0; }
+.max-h-56 { max-height: 14rem; }
+.max-w-\[160px\] { max-width: 160px; }
+.max-w-\[180px\] { max-width: 180px; }
+.max-w-sm { max-width: 24rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+@media (min-width: 768px) { .md\:hidden { display: none; } }
+@media (min-width: 768px) { .md\:relative { position: relative; } }
+@media (min-width: 768px) { .md\:translate-x-0 { transform: translateX(0); } }
+.min-w-0 { min-width: 0; }
+.opacity-40 { opacity: 0.4; }
+.opacity-60 { opacity: 0.6; }
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.p-1 { padding: 0.25rem; }
+.p-1\.5 { padding: 0.375rem; }
+.p-2 { padding: 0.5rem; }
+.p-2\.5 { padding: 0.625rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.pb-1 { padding-bottom: 0.25rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.placeholder-slate-400::placeholder { color: rgb(148, 163, 184); }
+.pt-3 { padding-top: 0.75rem; }
+.px-1\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.relative { position: relative; }
+.resize-none { resize: none; }
+.rounded { border-radius: 0.25rem; }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-full { border-radius: 9999px; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-md { border-radius: 0.375rem; }
+.rounded-xl { border-radius: 0.75rem; }
+
+#backToTopBtn {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 40;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 45%, #8b5cf6 100%);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 8px 20px -4px rgba(59,130,246,0.5), 0 4px 10px -2px rgba(139,92,246,0.35);
+    opacity: 0;
+    transform: translateY(10px) scale(0.85);
+    pointer-events: none;
+    transition: opacity 250ms ease, transform 250ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease;
+    cursor: pointer;
+}
+#backToTopBtn::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+    opacity: 0.35;
+    filter: blur(7px);
+    z-index: -1;
+    transition: opacity 200ms ease;
+}
+#backToTopBtn.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+#backToTopBtn:hover {
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 14px 28px -6px rgba(59,130,246,0.55), 0 8px 14px -4px rgba(139,92,246,0.45);
+}
+#backToTopBtn:hover::before {
+    opacity: 0.6;
+}
+#backToTopBtn:active {
+    transform: translateY(-1px) scale(0.95);
+}
+#backToTopBtn i {
+    font-size: 1.15rem;
+    animation: backToTopBounce 2.2s ease-in-out infinite;
+}
+@keyframes backToTopBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+.dark #backToTopBtn {
+    box-shadow: 0 8px 20px -4px rgba(139,92,246,0.45), 0 4px 10px -2px rgba(59,130,246,0.35);
+}
+.dark #backToTopBtn:hover {
+    box-shadow: 0 14px 28px -6px rgba(139,92,246,0.55), 0 8px 14px -4px rgba(59,130,246,0.45);
+}
+.scale-95 { transform: scale(0.95); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+.shadow-sm { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); }
+.shadow-xs { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+.shrink-0 { flex-shrink: 0; }
+@media (min-width: 640px) { .sm\:inline { display: inline; } }
+@media (min-width: 640px) { .sm\:max-w-xs { max-width: 20rem; } }
+.sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
+@media (min-width: 640px) { .sm\:text-base { font-size: 1rem; } }
+.space-x-1 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.25rem; }
+.space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
+.space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
+.space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-\[10px\] { font-size: 10px; }
+.text-\[11px\] { font-size: 11px; }
+.text-\[8px\] { font-size: 8px; }
+.text-amber-500 { color: rgb(245, 158, 11); }
+.text-base { font-size: 1rem; }
+.text-blue-500 { color: rgb(59, 130, 246); }
+.text-blue-600 { color: rgb(37, 99, 235); }
+.text-center { text-align: center; }
+.text-emerald-600 { color: rgb(5, 150, 105); }
+.text-lg { font-size: 1.125rem; }
+.text-primary { color: #3b82f6; }
+.text-purple-500 { color: rgb(168, 85, 247); }
+.text-purple-600 { color: rgb(147, 51, 234); }
+.text-slate-400 { color: rgb(148, 163, 184); }
+.text-slate-500 { color: rgb(100, 116, 139); }
+.text-slate-600 { color: rgb(71, 85, 105); }
+.text-slate-700 { color: rgb(51, 65, 85); }
+.text-slate-800 { color: rgb(30, 41, 59); }
+.text-sm { font-size: 0.875rem; }
+.text-white { color: #ffffff; }
+.text-xs { font-size: 0.75rem; }
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-wide { letter-spacing: 0.025em; }
+.transition { transition-property: all; transition-duration: 150ms; transition-timing-function: cubic-bezier(0.4,0,0.2,1); }
+.transition-colors { transition-property: background-color,border-color,color,fill,stroke; transition-duration: 150ms; }
+.transition-opacity { transition-property: opacity; transition-duration: 150ms; }
+.transition-transform { transition-property: transform; transition-duration: 150ms; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uppercase { text-transform: uppercase; }
+.w-10 { width: 2.5rem; }
+.w-2 { width: 0.5rem; }
+.w-4 { width: 1rem; }
+.w-72 { width: 18rem; }
+.w-full { width: 100%; }
+.whitespace-nowrap { white-space: nowrap; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-50 { z-index: 50; }
+.bg-blue-50\/80 { background-color: rgba(239, 246, 255, 0.8); }
+.bg-emerald-50\/80 { background-color: rgba(236, 253, 245, 0.8); }
+.border-emerald-500 { border-color: rgb(16, 185, 129); }
+.border-l-4 { border-left-width: 4px; border-left-style: solid; }
+.border-primary { border-color: #3b82f6; }
+.dark .dark\:bg-blue-900\/20 { background-color: rgba(30, 58, 138, 0.2); }
+.dark .dark\:bg-emerald-900\/20 { background-color: rgba(6, 78, 59, 0.2); }
+.dark .dark\:hover\:bg-slate-700\/50:hover { background-color: rgba(51, 65, 85, 0.5); }
+.pl-4 { padding-left: 1rem; }
+.space-x-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.625rem; }
+.fa-solid, [class*="fa-"] { display: inline-flex; width: 1em; height: 1em; vertical-align: -0.125em; flex-shrink: 0; }
+.fa-solid svg, [class*="fa-"] svg { width: 100%; height: 100%; display: block; }
+</style>
+</head>
+
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+
+    <!-- HEADER -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div class="flex items-center space-x-3">
+            <button id="sidebarToggle" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition active:scale-95" aria-label="Toggle Files">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+
+            <div class="flex flex-col">
+                <div class="flex items-center space-x-2">
+                    <span id="fileNameDisplay" class="font-semibold text-sm sm:text-base tracking-tight truncate max-w-[160px] sm:max-w-xs cursor-pointer hover:text-primary transition" title="Click to rename">
+                        index.html <i class="fa-solid fa-pen text-[10px] opacity-60"></i>
+                    </span>
+                    <span id="unsavedIndicator" class="hidden w-2 h-2 rounded-full bg-amber-500 animate-pulse" title="Unsaved changes"></span>
+                </div>
+
+                <span id="fileHandleStatus" class="text-[10px] text-slate-400 dark:text-slate-500 truncate max-w-[180px]">
+                    New Local File
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-1 sm:space-x-2">
+            <button id="previewBtn" title="Live Preview HTML" class="flex items-center space-x-1 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition active:scale-95 font-medium text-xs">
+                <i class="fa-solid fa-eye text-sm"></i>
+                <span class="hidden sm:inline">Preview</span>
+            </button>
+
+            <button id="newBtn" title="New Note" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition active:scale-95 flex items-center justify-center">
+                <i class="fa-solid fa-file-circle-plus text-sm"></i>
+            </button>
+
+            <button id="saveAsBtn" title="Save File to Device..." class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition active:scale-95 flex items-center justify-center font-medium text-xs space-x-1 px-3">
+                <i class="fa-solid fa-floppy-disk text-sm"></i>
+                <span class="hidden sm:inline">Save</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex relative overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="absolute inset-y-0 left-0 z-20 w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:relative md:translate-x-0">
+
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <h2 class="font-bold text-sm tracking-wide uppercase text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-notebook"></i> Saved Notes
+                </h2>
+
+                <button id="closeSidebar" class="md:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-3 border-b border-slate-200 dark:border-slate-700">
+                <button id="openFolderBtn" class="w-full flex items-center justify-center gap-2 text-xs font-medium py-2 px-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition active:scale-95">
+                    <i class="fa-solid fa-folder-open"></i> Open Folder
+                </button>
+                <input type="file" id="folderInputFallback" webkitdirectory directory multiple class="hidden">
+            </div>
+
+            <div id="folderSection" class="hidden border-b border-slate-200 dark:border-slate-700">
+                <div class="px-3 pt-3 pb-1 flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 truncate flex items-center gap-1.5 min-w-0">
+                        <i class="fa-solid fa-folder text-amber-500 shrink-0"></i>
+                        <span id="folderNameText" class="truncate">Folder</span>
+                    </h3>
+
+                    <button id="closeFolderBtn" title="Close folder" class="text-slate-400 hover:text-red-500 p-1 rounded shrink-0">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+
+                <div id="folderFilesList" class="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50 pb-2"></div>
+            </div>
+
+            <div id="notesList" class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50"></div>
+
+            <div class="p-3 border-t border-slate-200 dark:border-slate-700 flex flex-col gap-3 bg-slate-50 dark:bg-slate-800/80">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Dark Appearance</span>
+
+                    <button id="themeToggle" class="w-10 h-6 flex items-center bg-slate-300 dark:bg-primary rounded-full p-1 transition-colors cursor-pointer" aria-label="Toggle theme">
+                        <div id="themeToggleDot" class="bg-white w-4 h-4 rounded-full shadow-md transform dark:translate-x-4 transition-transform"></div>
+                    </button>
+                </div>
+
+                <button id="hardRefreshBtn" class="w-full py-2 px-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-rotate text-primary"></i> Hard Refresh App
+                </button>
+            </div>
+        </aside>
+
+        <!-- MOBILE BACKDROP -->
+        <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/50 z-10 hidden md:hidden transition-opacity"></div>
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-white dark:bg-slate-900 relative">
+
+            <!-- QUICK TOOLBAR -->
+            <div id="quickToolbar" class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 px-2 py-1.5 flex items-center space-x-1 overflow-x-auto shrink-0 text-xs">
+
+                <button data-insert="boilerplate" class="quick-insert px-2.5 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap shadow-xs">
+                    HTML5 Boilerplate
+                </button>
+
+                <button data-insert="<h1>Heading</h1>" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    &lt;h1&gt;
+                </button>
+
+                <button data-insert="div" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    &lt;div&gt;
+                </button>
+
+                <button data-insert="script" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    &lt;script&gt;
+                </button>
+
+                <button data-insert="style" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    &lt;style&gt;
+                </button>
+
+                <button data-insert="<a href=&quot;#&quot;>Link</a>" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    &lt;a&gt;
+                </button>
+
+                <button data-insert="class" class="quick-insert px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 whitespace-nowrap">
+                    class=""
+                </button>
+            </div>
+
+            <!-- EDITOR + PREVIEW -->
+            <div class="flex-1 relative flex">
+                <textarea id="editor" class="code-font w-full h-full p-4 bg-transparent resize-none focus:outline-none text-sm leading-relaxed text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="Type or paste your code/notes here... (e.g. index.html)" spellcheck="false"></textarea>
+
+                <div id="previewContainer" class="absolute inset-0 bg-white dark:bg-slate-900 hidden flex flex-col z-10">
+                    <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">
+                        <span class="font-semibold text-slate-600 dark:text-slate-300">
+                            <i class="fa-solid fa-eye text-purple-500"></i> Live Preview
+                        </span>
+
+                        <button id="closePreviewBtn" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-md text-slate-700 dark:text-slate-200 font-medium">
+                            Close Preview
+                        </button>
+                    </div>
+
+                    <iframe id="previewFrame" class="w-full flex-1 border-none bg-white" sandbox="allow-scripts allow-same-origin"></iframe>
+                </div>
+            </div>
+
+            <!-- STATUS BAR -->
+            <div class="bg-slate-100 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 px-4 py-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-4">
+                    <span id="wordCount">Words: 0</span>
+                    <span id="charCount">Chars: 0</span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <button id="saveLocationHelpBtn" class="text-blue-500 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium text-[11px] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md">
+                        <i class="fa-solid fa-circle-question"></i> Where are files saved?
+                    </button>
+
+                    <span id="encodingStatus" class="uppercase font-medium text-[10px] bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300">
+                        UTF-8
+                    </span>
+
+                    <span id="fsApiStatus" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                        <i class="fa-solid fa-circle text-[8px]"></i> Ready
+                    </span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- BACK TO TOP -->
+    <button id="backToTopBtn" title="Back to top" aria-label="Back to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- MODAL -->
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-200" id="modalContainer">
+
+            <div class="flex items-center space-x-3 mb-4">
+                <div id="modalIcon" class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shrink-0">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div>
+                    <h3 id="modalTitle" class="font-bold text-base text-slate-800 dark:text-slate-100">Notice</h3>
+                    <p id="modalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">File operation message</p>
+                </div>
+            </div>
+
+            <div id="modalContent" class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+                Message content goes here.
+            </div>
+
+            <div id="modalActions" class="flex space-x-3 justify-end">
+                <button id="modalCancelBtn" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium transition">
+                    Cancel
+                </button>
+
+                <button id="modalConfirmBtn" class="px-4 py-2 rounded-xl bg-primary text-white hover:bg-blue-600 text-sm font-medium transition shadow-sm">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           ICONS (inline SVG, injected into any element carrying an
+           fa-* class — replaces the old Font Awesome webfont icons)
+        ========================================================= */
+
+const ICONS = {
+    "bars": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"/><line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"/></svg>",
+    "xmark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"5\" y1=\"5\" x2=\"19\" y2=\"19\"/><line x1=\"19\" y1=\"5\" x2=\"5\" y2=\"19\"/></svg>",
+    "circle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/></svg>",
+    "circle-info": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><line x1=\"12\" y1=\"11\" x2=\"12\" y2=\"16\"/><circle cx=\"12\" cy=\"7.5\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/></svg>",
+    "circle-question": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.3 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.3 1-1.3 1.9\"/><circle cx=\"12\" cy=\"17\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/></svg>",
+    "eye": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",
+    "file-circle-plus": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h5.5\"/><path d=\"M13 3v5h5\"/><circle cx=\"17\" cy=\"17.5\" r=\"4\"/><line x1=\"17\" y1=\"15.5\" x2=\"17\" y2=\"19.5\"/><line x1=\"15\" y1=\"17.5\" x2=\"19\" y2=\"17.5\"/></svg>",
+    "file-code": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z\"/><path d=\"M13 3v5h5\"/><path d=\"m10 12.5-2 2 2 2M14 12.5l2 2-2 2\"/></svg>",
+    "file-lines": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z\"/><path d=\"M13 3v5h5\"/><line x1=\"8\" y1=\"13.5\" x2=\"16\" y2=\"13.5\"/><line x1=\"8\" y1=\"17\" x2=\"16\" y2=\"17\"/></svg>",
+    "floppy-disk": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 3h11l3 3v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z\"/><path d=\"M7 3v6h8V3\"/><rect x=\"7\" y=\"14\" width=\"10\" height=\"6\"/></svg>",
+    "folder": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5Z\"/></svg>",
+    "folder-open": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h7.5A1.5 1.5 0 0 1 20 9.5V11\"/><path d=\"M3.5 19 5.7 12a1 1 0 0 1 1-.7h13.4a1 1 0 0 1 1 1.3l-1.7 5.6a1 1 0 0 1-1 .8H4.5a1 1 0 0 1-1-1Z\"/></svg>",
+    "notebook": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"3\" width=\"15\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"7.5\" x2=\"16\" y2=\"7.5\"/><line x1=\"9\" y1=\"11.5\" x2=\"16\" y2=\"11.5\"/><line x1=\"2.5\" y1=\"6\" x2=\"4.2\" y2=\"6\"/><line x1=\"2.5\" y1=\"10\" x2=\"4.2\" y2=\"10\"/><line x1=\"2.5\" y1=\"14\" x2=\"4.2\" y2=\"14\"/><line x1=\"2.5\" y1=\"18\" x2=\"4.2\" y2=\"18\"/></svg>",
+    "pen": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 20.5 5 16l11-11 3 3-11 11-4 1.5Z\"/><line x1=\"14.5\" y1=\"6.5\" x2=\"17.5\" y2=\"9.5\"/></svg>",
+    "rotate": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.5 9a8 8 0 1 1 1.3 8\"/><polyline points=\"4.5 4 4.5 9 9.5 9\"/></svg>",
+    "trash-can": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"4\" y1=\"6\" x2=\"20\" y2=\"6\"/><path d=\"M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\"/><path d=\"M6 6l1 14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-14\"/><line x1=\"10\" y1=\"10\" x2=\"10\" y2=\"17\"/><line x1=\"14\" y1=\"10\" x2=\"14\" y2=\"17\"/></svg>",
+    "triangle-exclamation": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3 22 20H2Z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"14\"/><circle cx=\"12\" cy=\"17.3\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/></svg>"
+};
+
+
+        function applyIconTo(el) {
+            if (!el.classList || (el.dataset && el.dataset.iconApplied)) {
+                return;
+            }
+
+            let iconName = null;
+
+            el.classList.forEach(cls => {
+                if (iconName) return;
+                const match = cls.match(/^fa-([a-z0-9-]+)$/);
+                if (match && match[1] !== "solid" && ICONS[match[1]]) {
+                    iconName = match[1];
+                }
+            });
+
+            if (!iconName) {
+                return;
+            }
+
+            el.innerHTML = ICONS[iconName];
+            el.dataset.iconApplied = "1";
+        }
+
+        function processIconsIn(node) {
+            if (!node || node.nodeType !== 1) {
+                return;
+            }
+
+            applyIconTo(node);
+
+            if (node.querySelectorAll) {
+                node.querySelectorAll('[class*="fa-"]').forEach(applyIconTo);
+            }
+        }
+
+        processIconsIn(document.body);
+
+        const iconObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(processIconsIn);
+            });
+        });
+
+        iconObserver.observe(document.body, { childList: true, subtree: true });
+
+        /* =========================================================
+           STATE
+        ========================================================= */
+
+        let currentFileHandle = null;
+        let currentFileName = "index.html";
+        let currentNoteId = null;
+
+        let isDirty = false;
+        let isInitializing = true;
+        let autoSaveTimer = null;
+        let previewObjectUrls = [];
+
+        // Open Folder state
+        let currentDirName = "";
+        let openFolderEntries = [];
+        let activeFolderEntry = null;
+
+        const STORAGE_KEY = "mobile_notepad_files";
+
+        const DEFAULT_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Web Page</title>
+</head>
+<body>
+    <h1>Hello from Mobile Notepad!</h1>
+</body>
+</html>`;
+
+        /* =========================================================
+           DOM REFERENCES
+        ========================================================= */
+
+        const editor = document.getElementById("editor");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+        const fileHandleStatus = document.getElementById("fileHandleStatus");
+        const unsavedIndicator = document.getElementById("unsavedIndicator");
+        const wordCountDisplay = document.getElementById("wordCount");
+        const charCountDisplay = document.getElementById("charCount");
+        const notesList = document.getElementById("notesList");
+
+        const openFolderBtn = document.getElementById("openFolderBtn");
+        const folderInputFallback = document.getElementById("folderInputFallback");
+        const folderSection = document.getElementById("folderSection");
+        const folderNameText = document.getElementById("folderNameText");
+        const folderFilesList = document.getElementById("folderFilesList");
+        const closeFolderBtn = document.getElementById("closeFolderBtn");
+
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+
+        const newBtn = document.getElementById("newBtn");
+        const saveAsBtn = document.getElementById("saveAsBtn");
+        const previewBtn = document.getElementById("previewBtn");
+        const closePreviewBtn = document.getElementById("closePreviewBtn");
+        const previewContainer = document.getElementById("previewContainer");
+        const previewFrame = document.getElementById("previewFrame");
+        const backToTopBtn = document.getElementById("backToTopBtn");
+
+        const themeToggle = document.getElementById("themeToggle");
+        const hardRefreshBtn = document.getElementById("hardRefreshBtn");
+        const saveLocationHelpBtn = document.getElementById("saveLocationHelpBtn");
+
+        const modalOverlay = document.getElementById("modalOverlay");
+        const modalContainer = document.getElementById("modalContainer");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalSubtitle = document.getElementById("modalSubtitle");
+        const modalContent = document.getElementById("modalContent");
+        let modalConfirmBtn = document.getElementById("modalConfirmBtn");
+        let modalCancelBtn = document.getElementById("modalCancelBtn");
+        const modalIcon = document.getElementById("modalIcon");
+
+        /* =========================================================
+           MODAL SYSTEM
+        ========================================================= */
+
+        function showModal({
+            title,
+            subtitle = "",
+            content,
+            confirmText = "OK",
+            cancelText = "Cancel",
+            showCancel = true,
+            iconClass = "fa-solid fa-circle-info",
+            confirmBtnClass = "bg-primary hover:bg-blue-600 text-white",
+            onConfirm = null
+        }) {
+            modalTitle.textContent = title;
+            modalSubtitle.textContent = subtitle;
+            modalContent.innerHTML = content;
+            modalIcon.innerHTML = `<i class="${iconClass}"></i>`;
+
+            modalConfirmBtn.textContent = confirmText;
+            modalConfirmBtn.className = `px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm ${confirmBtnClass}`;
+
+            modalCancelBtn.style.display = showCancel ? "block" : "none";
+            modalCancelBtn.textContent = cancelText;
+
+            modalOverlay.classList.remove("hidden");
+
+            setTimeout(() => {
+                modalContainer.classList.remove("scale-95");
+            }, 10);
+
+            // Replace buttons to remove previous listeners.
+            const newConfirmBtn = modalConfirmBtn.cloneNode(true);
+            modalConfirmBtn.parentNode.replaceChild(newConfirmBtn, modalConfirmBtn);
+            modalConfirmBtn = newConfirmBtn;
+
+            const newCancelBtn = modalCancelBtn.cloneNode(true);
+            modalCancelBtn.parentNode.replaceChild(newCancelBtn, modalCancelBtn);
+            modalCancelBtn = newCancelBtn;
+
+            modalConfirmBtn.addEventListener("click", () => {
+                closeModal();
+                if (typeof onConfirm === "function") {
+                    onConfirm();
+                }
+            });
+
+            modalCancelBtn.addEventListener("click", closeModal);
+        }
+
+        function closeModal() {
+            modalContainer.classList.add("scale-95");
+
+            setTimeout(() => {
+                modalOverlay.classList.add("hidden");
+            }, 150);
+        }
+
+        /* =========================================================
+           THEME
+        ========================================================= */
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem("theme");
+
+            if (
+                savedTheme === "dark" ||
+                (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        }
+
+        initTheme();
+
+        themeToggle.addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+
+            localStorage.setItem(
+                "theme",
+                document.documentElement.classList.contains("dark") ? "dark" : "light"
+            );
+        });
+
+        /* =========================================================
+           SIDEBAR
+        ========================================================= */
+
+        function toggleSidebar(open) {
+            if (open) {
+                sidebar.classList.remove("-translate-x-full");
+                sidebarBackdrop.classList.remove("hidden");
+            } else {
+                sidebar.classList.add("-translate-x-full");
+                sidebarBackdrop.classList.add("hidden");
+            }
+        }
+
+        sidebarToggle.addEventListener("click", () => toggleSidebar(true));
+        closeSidebar.addEventListener("click", () => toggleSidebar(false));
+        sidebarBackdrop.addEventListener("click", () => toggleSidebar(false));
+
+        /* =========================================================
+           PREVIEW
+        ========================================================= */
+
+        function isExternalRef(ref) {
+            return !ref
+                || /^[a-z][a-z0-9+.-]*:/i.test(ref)   // any scheme (http:, https:, data:, blob:, mailto:, etc.)
+                || ref.startsWith("//");               // protocol-relative
+        }
+
+        function normalizeRelativePath(basePath, ref) {
+            // A single leading "/" is commonly used to mean "relative to the
+            // project root" (not an actual absolute filesystem/URL path) —
+            // resolve it against the open folder's root rather than treating
+            // it as external.
+            const effectiveBase = ref.startsWith("/") ? "" : basePath;
+            const cleanRef = ref.startsWith("/") ? ref.slice(1) : ref;
+
+            const combined = (effectiveBase ? effectiveBase + "/" : "") + cleanRef;
+            const parts = combined.split("/");
+            const stack = [];
+
+            for (const part of parts) {
+                if (part === "" || part === ".") {
+                    continue;
+                }
+                if (part === "..") {
+                    stack.pop();
+                    continue;
+                }
+                stack.push(part);
+            }
+
+            return stack.join("/");
+        }
+
+        async function readFolderEntryAsText(entry) {
+            const file = entry.kind === "directoryAPI"
+                ? await entry.handle.getFile()
+                : entry.file;
+
+            return file.text();
+        }
+
+        // Finds a sibling file in the currently open folder matching a relative
+        // href/src, reads it, and returns a blob URL for it (or null if there's
+        // no open folder, the reference is external, or no match is found).
+        async function resolveFolderRef(ref, basePath) {
+            if (isExternalRef(ref) || openFolderEntries.length === 0) {
+                return { url: null, skipped: true };
+            }
+
+            const normalizedPath = normalizeRelativePath(basePath, ref);
+
+            let match = openFolderEntries.find(entry => entry.path === normalizedPath);
+
+            if (!match) {
+                // Fallback: match by filename alone, for flat folders or cases
+                // where the folder structure doesn't line up exactly.
+                const refName = ref.split("/").pop();
+                match = openFolderEntries.find(entry => entry.name === refName);
+            }
+
+            if (!match) {
+                return { url: null, skipped: false };
+            }
+
+            try {
+                const text = await readFolderEntryAsText(match);
+                const blob = new Blob([text], { type: getMimeType(match.name) });
+                const url = URL.createObjectURL(blob);
+                previewObjectUrls.push(url);
+                return { url, skipped: false };
+            } catch (error) {
+                console.warn("Preview: could not load referenced file", ref, error);
+                return { url: null, skipped: false };
+            }
+        }
+
+        // Finds a sibling file in the open folder matching a relative ref and
+        // returns its contents as a plain text string (or null if there's no
+        // open folder, the ref is external, or no matching file is found).
+        // Used to physically inline CSS/JS text into the preview HTML.
+        async function readMatchingFolderText(ref, basePath) {
+            if (isExternalRef(ref) || openFolderEntries.length === 0) {
+                return null;
+            }
+
+            const normalizedPath = normalizeRelativePath(basePath, ref);
+
+            let match = openFolderEntries.find(entry => entry.path === normalizedPath);
+
+            if (!match) {
+                const refName = ref.split("/").pop();
+                match = openFolderEntries.find(entry => entry.name === refName);
+            }
+
+            if (!match) {
+                return null;
+            }
+
+            try {
+                return await readFolderEntryAsText(match);
+            } catch (error) {
+                console.warn("Preview: could not load referenced file", ref, error);
+                return null;
+            }
+        }
+
+        // Combines a multi-file setup (index.html + style.css + main.js, etc.)
+        // into a single self-contained HTML string by reading each locally
+        // referenced stylesheet/script as text and inlining it directly in
+        // place of the <link>/<script src> tag. This is what lets the sandboxed
+        // <iframe> render the whole "project" via srcdoc without needing
+        // separate network requests for each file.
+        async function inlineLocalAssets(htmlText, basePath) {
+            if (openFolderEntries.length === 0) {
+                return { html: htmlText, unresolved: [] };
+            }
+
+            let result = htmlText;
+            const unresolved = [];
+
+            // --- Inline stylesheets: <link rel="stylesheet" href="..."> -> <style>
+            {
+                const linkPattern = /<link\b[^>]*>/gi;
+                const matches = [...result.matchAll(linkPattern)];
+
+                for (let i = matches.length - 1; i >= 0; i--) {
+                    const tag = matches[i][0];
+
+                    if (!/\brel\s*=\s*["']?stylesheet["']?/i.test(tag)) {
+                        continue;
+                    }
+
+                    const hrefMatch = tag.match(/\bhref\s*=\s*(["'])(.*?)\1/i);
+                    if (!hrefMatch) {
+                        continue;
+                    }
+
+                    const ref = hrefMatch[2];
+                    if (isExternalRef(ref)) {
+                        continue;
+                    }
+
+                    const text = await readMatchingFolderText(ref, basePath);
+
+                    if (text !== null) {
+                        const replacement = `<style data-inlined-from="${escapeHtml(ref)}">\n${text}\n</style>`;
+                        result = result.slice(0, matches[i].index)
+                            + replacement
+                            + result.slice(matches[i].index + tag.length);
+                    } else {
+                        unresolved.push(ref);
+                    }
+                }
+            }
+
+            // --- Inline scripts: <script src="..."> tags -> plain inline <script> tags
+            {
+                const scriptPattern = /<script\b[^>]*\bsrc\s*=\s*(["'])(.*?)\1[^>]*>\s*<\/script>/gi;
+                const matches = [...result.matchAll(scriptPattern)];
+
+                for (let i = matches.length - 1; i >= 0; i--) {
+                    const full = matches[i][0];
+                    const ref = matches[i][2];
+
+                    if (isExternalRef(ref)) {
+                        continue;
+                    }
+
+                    const text = await readMatchingFolderText(ref, basePath);
+
+                    if (text !== null) {
+                        const replacement = `<script data-inlined-from="${escapeHtml(ref)}">\n${text}\n<\/script>`;
+                        result = result.slice(0, matches[i].index)
+                            + replacement
+                            + result.slice(matches[i].index + full.length);
+                    } else {
+                        unresolved.push(ref);
+                    }
+                }
+            }
+
+            return { html: result, unresolved };
+        }
+
+        // Rewrites relative href="" / src="" in <link> and <script> tags to
+        // point at blob URLs built from the matching files in the open folder,
+        // so previewing an .html file also pulls in its sibling .css/.js.
+        // Returns both the rewritten HTML and a list of references that looked
+        // local but had no matching file, so that can be surfaced to the user.
+        // (Used as a fallback for anything inlineLocalAssets doesn't handle,
+        // e.g. non-stylesheet <link> tags or other binary assets.)
+        async function resolvePreviewHtml(htmlText) {
+            if (openFolderEntries.length === 0) {
+                return { html: htmlText, unresolved: [] };
+            }
+
+            const basePath = activeFolderEntry
+                ? activeFolderEntry.path.split("/").slice(0, -1).join("/")
+                : "";
+
+            const refPattern = /(<(?:link|script)\b[^>]*?\b(?:href|src)\s*=\s*)(["'])(.*?)\2/gi;
+            const matches = [];
+            let match;
+
+            while ((match = refPattern.exec(htmlText)) !== null) {
+                matches.push(match);
+            }
+
+            let result = htmlText;
+            const unresolved = [];
+
+            // Walk backwards so earlier replacements don't shift later indices.
+            for (let i = matches.length - 1; i >= 0; i--) {
+                const [full, prefix, quote, ref] = matches[i];
+                const { url, skipped } = await resolveFolderRef(ref, basePath);
+
+                if (url) {
+                    const replacement = `${prefix}${quote}${url}${quote}`;
+                    result = result.slice(0, matches[i].index)
+                        + replacement
+                        + result.slice(matches[i].index + full.length);
+                } else if (!skipped) {
+                    unresolved.unshift(ref);
+                }
+            }
+
+            return { html: result, unresolved };
+        }
+
+        function injectUnresolvedBanner(htmlText, unresolved) {
+            if (unresolved.length === 0) {
+                return htmlText;
+            }
+
+            const items = unresolved
+                .map(ref => `<code style="background:rgba(0,0,0,0.15);padding:1px 5px;border-radius:4px;">${escapeHtml(ref)}</code>`)
+                .join(", ");
+
+            const banner = `
+                <div style="position:fixed;top:0;left:0;right:0;z-index:2147483647;
+                    background:#f59e0b;color:#111;font:12px/1.5 -apple-system,system-ui,sans-serif;
+                    padding:8px 12px;">
+                    <b>Preview:</b> could not find a matching file in the open folder for: ${items}
+                    — check the filename/path matches exactly.
+                </div>
+            `;
+
+            return /<body[^>]*>/i.test(htmlText)
+                ? htmlText.replace(/<body[^>]*>/i, match => `${match}${banner}`)
+                : banner + htmlText;
+        }
+
+        async function togglePreview(show) {
+            if (show) {
+                previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+                previewObjectUrls = [];
+
+                const basePath = activeFolderEntry
+                    ? activeFolderEntry.path.split("/").slice(0, -1).join("/")
+                    : "";
+
+                // Step 1: read sibling CSS/JS files as text and inline them
+                // directly into the HTML string (multi-file -> single string).
+                const { html: inlinedHtml, unresolved: inlineUnresolved } =
+                    await inlineLocalAssets(editor.value, basePath);
+
+                // Step 2: anything left over (images, fonts, non-stylesheet
+                // links, etc.) still gets rewritten to blob URLs so the
+                // preview can load it.
+                const { html, unresolved: blobUnresolved } =
+                    await resolvePreviewHtml(inlinedHtml);
+
+                const finalHtml = injectUnresolvedBanner(
+                    html,
+                    [...inlineUnresolved, ...blobUnresolved]
+                );
+
+                // Inject the combined HTML straight into the iframe via
+                // srcdoc rather than a blob URL for the document itself.
+                previewFrame.removeAttribute("src");
+                previewFrame.srcdoc = finalHtml;
+                previewContainer.classList.remove("hidden");
+                updateBackToTopVisibility();
+            } else {
+                previewContainer.classList.add("hidden");
+                previewFrame.removeAttribute("srcdoc");
+                previewFrame.src = "about:blank";
+
+                previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+                previewObjectUrls = [];
+                updateBackToTopVisibility();
+            }
+        }
+
+        previewBtn.addEventListener("click", () => togglePreview(true));
+        closePreviewBtn.addEventListener("click", () => togglePreview(false));
+
+        /* =========================================================
+           BACK TO TOP
+        ========================================================= */
+
+        function updateBackToTopVisibility() {
+            const previewOpen = !previewContainer.classList.contains("hidden");
+            const scrolledDown = editor.scrollTop > 150;
+
+            backToTopBtn.classList.toggle("visible", !previewOpen && scrolledDown);
+        }
+
+        editor.addEventListener("scroll", updateBackToTopVisibility);
+
+        backToTopBtn.addEventListener("click", () => {
+            editor.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        /* =========================================================
+           FILE NAME HELPERS
+        ========================================================= */
+
+        function sanitizeFileName(name) {
+            let cleanName = String(name || "").trim();
+
+            // Remove characters that are invalid or problematic in filenames.
+            cleanName = cleanName.replace(/[<>:"/\\|?*\x00-\x1F]/g, "");
+
+            // Prevent empty filenames.
+            if (!cleanName) {
+                cleanName = "index.html";
+            }
+
+            // Limit filename length.
+            if (cleanName.length > 150) {
+                cleanName = cleanName.substring(0, 150);
+            }
+
+            return cleanName;
+        }
+
+        function updateFileNameDisplay() {
+            fileNameDisplay.textContent = currentFileName;
+
+            const icon = document.createElement("i");
+            icon.className = "fa-solid fa-pen text-[10px] opacity-60";
+            fileNameDisplay.appendChild(document.createTextNode(" "));
+            fileNameDisplay.appendChild(icon);
+        }
+
+        /* =========================================================
+           STORAGE
+        ========================================================= */
+
+        function getSavedNotes() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+
+                if (!raw) {
+                    return [];
+                }
+
+                const parsed = JSON.parse(raw);
+
+                if (!Array.isArray(parsed)) {
+                    return [];
+                }
+
+                let migrated = false;
+
+                const notes = parsed
+                    .filter(note => note && typeof note === "object")
+                    .map(note => {
+                        let name = note.name || "index.html";
+
+                        if (
+                            name === "document.html" ||
+                            name === "document.txt" ||
+                            name === ""
+                        ) {
+                            name = "index.html";
+                            migrated = true;
+                        }
+
+                        return {
+                            id: String(note.id || ("note_" + Date.now() + Math.random())),
+                            name: sanitizeFileName(name),
+                            content: typeof note.content === "string" ? note.content : "",
+                            updatedAt: Number(note.updatedAt) || Date.now()
+                        };
+                    });
+
+                if (migrated) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+                }
+
+                return notes;
+            } catch (error) {
+                console.error("Could not read saved notes:", error);
+                return [];
+            }
+        }
+
+        function writeNotes(notes) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+                return true;
+            } catch (error) {
+                console.error("Could not save notes:", error);
+
+                showModal({
+                    title: "Storage Error",
+                    subtitle: "Unable to save locally",
+                    content: "Your browser's local storage may be full or unavailable. Try deleting some saved notes or exporting your work to your device.",
+                    confirmText: "Understood",
+                    showCancel: false,
+                    iconClass: "fa-solid fa-triangle-exclamation text-red-500",
+                    confirmBtnClass: "bg-red-600 hover:bg-red-700 text-white"
+                });
+
+                return false;
+            }
+        }
+
+        /* =========================================================
+           NOTES LIST
+        ========================================================= */
+
+        function getFileIcon(fileName) {
+            const name = fileName.toLowerCase();
+
+            if (name.endsWith(".html") || name.endsWith(".htm")) {
+                return "fa-file-code text-orange-500";
+            }
+
+            if (name.endsWith(".js")) {
+                return "fa-file-code text-yellow-500";
+            }
+
+            if (name.endsWith(".css")) {
+                return "fa-file-code text-blue-500";
+            }
+
+            if (name.endsWith(".json")) {
+                return "fa-file-code text-green-500";
+            }
+
+            if (name.endsWith(".md")) {
+                return "fa-file-lines text-purple-500";
+            }
+
+            return "fa-file-lines text-slate-400";
+        }
+
+        function renderNotesList() {
+            const notes = getSavedNotes();
+            notesList.innerHTML = "";
+
+            if (notes.length === 0) {
+                notesList.innerHTML = `
+                    <div class="p-6 text-center text-slate-400 text-xs">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 block opacity-40"></i>
+                        No saved notes yet. Create or save a file to see it here!
+                    </div>
+                `;
+                return;
+            }
+
+            notes.forEach(note => {
+                const item = document.createElement("div");
+
+                item.className = `p-3 hover:bg-slate-100 dark:hover:bg-slate-700/50 cursor-pointer flex items-center justify-between transition group ${
+                    currentNoteId === note.id
+                        ? "bg-blue-50/80 dark:bg-blue-900/20 border-l-4 border-primary"
+                        : ""
+                }`;
+
+                const infoButton = document.createElement("div");
+                infoButton.className = "flex items-center space-x-3 truncate flex-1 min-w-0";
+
+                const icon = document.createElement("i");
+                icon.className = `fa-solid ${getFileIcon(note.name)} text-base shrink-0`;
+
+                const textContainer = document.createElement("div");
+                textContainer.className = "truncate";
+
+                const nameText = document.createElement("p");
+                nameText.className = "text-sm font-medium text-slate-700 dark:text-slate-200 truncate";
+                nameText.textContent = note.name;
+
+                const metaText = document.createElement("p");
+                metaText.className = "text-[10px] text-slate-400";
+                metaText.textContent = `${new Date(note.updatedAt).toLocaleDateString()} • ${note.content.length} chars`;
+
+                textContainer.appendChild(nameText);
+                textContainer.appendChild(metaText);
+
+                infoButton.appendChild(icon);
+                infoButton.appendChild(textContainer);
+
+                infoButton.addEventListener("click", () => {
+                    loadNote(note.id);
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "p-2 text-slate-400 hover:text-red-500 transition rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 z-10";
+                deleteButton.title = "Delete note";
+                deleteButton.setAttribute("aria-label", `Delete ${note.name}`);
+
+                const deleteIcon = document.createElement("i");
+                deleteIcon.className = "fa-solid fa-trash-can text-sm";
+
+                deleteButton.appendChild(deleteIcon);
+
+                deleteButton.addEventListener("click", event => {
+                    event.stopPropagation();
+                    deleteNotePrompt(note.id, note.name);
+                });
+
+                item.appendChild(infoButton);
+                item.appendChild(deleteButton);
+                notesList.appendChild(item);
+            });
+        }
+
+        /* =========================================================
+           OPEN FOLDER (read a folder's contents: index.html, app.js, .css, etc.)
+        ========================================================= */
+
+        const supportsDirectoryPicker = "showDirectoryPicker" in window;
+        const SKIP_ENTRY_NAMES = new Set(["node_modules", ".git", ".DS_Store"]);
+
+        async function collectDirEntries(dirHandle, basePath, depth = 0) {
+            const results = [];
+
+            // Safety limit so a huge/nested folder can't hang the UI.
+            if (depth > 6) {
+                return results;
+            }
+
+            for await (const [name, handle] of dirHandle.entries()) {
+                if (SKIP_ENTRY_NAMES.has(name) || name.startsWith(".")) {
+                    continue;
+                }
+
+                const path = basePath ? `${basePath}/${name}` : name;
+
+                if (handle.kind === "file") {
+                    results.push({ path, name, handle, kind: "directoryAPI" });
+                } else if (handle.kind === "directory") {
+                    const nested = await collectDirEntries(handle, path, depth + 1);
+                    results.push(...nested);
+                }
+            }
+
+            return results;
+        }
+
+        function showFolderEntries(name, entries) {
+            currentDirName = name;
+            openFolderEntries = entries.sort((a, b) => a.path.localeCompare(b.path));
+            activeFolderEntry = null;
+
+            folderNameText.textContent = name;
+            folderNameText.title = name;
+            folderSection.classList.remove("hidden");
+
+            renderFolderFilesList();
+        }
+
+        function renderFolderFilesList() {
+            folderFilesList.innerHTML = "";
+
+            if (openFolderEntries.length === 0) {
+                folderFilesList.innerHTML = `
+                    <div class="p-4 text-center text-slate-400 text-xs">
+                        No readable files found in this folder.
+                    </div>
+                `;
+                return;
+            }
+
+            openFolderEntries.forEach(entry => {
+                const item = document.createElement("div");
+
+                item.className = `p-2.5 pl-4 hover:bg-slate-100 dark:hover:bg-slate-700/50 cursor-pointer flex items-center space-x-2.5 transition ${
+                    activeFolderEntry && activeFolderEntry.path === entry.path
+                        ? "bg-emerald-50/80 dark:bg-emerald-900/20 border-l-4 border-emerald-500"
+                        : ""
+                }`;
+
+                const icon = document.createElement("i");
+                icon.className = `fa-solid ${getFileIcon(entry.name)} text-sm shrink-0`;
+
+                const label = document.createElement("span");
+                label.className = "text-xs font-medium text-slate-700 dark:text-slate-200 truncate";
+                label.textContent = entry.path;
+                label.title = entry.path;
+
+                item.appendChild(icon);
+                item.appendChild(label);
+
+                item.addEventListener("click", () => openFolderEntry(entry));
+
+                folderFilesList.appendChild(item);
+            });
+        }
+
+        function openFolderEntry(entry) {
+            if (isDirty && editor.value.trim() !== "") {
+                showModal({
+                    title: "Open File?",
+                    subtitle: "Unsaved modifications",
+                    content: `You have unsaved changes. Open "<b>${escapeHtml(entry.name)}</b>" without saving them?`,
+                    confirmText: "Open",
+                    cancelText: "Cancel",
+                    showCancel: true,
+                    iconClass: "fa-solid fa-circle-info text-blue-500",
+                    confirmBtnClass: "bg-primary hover:bg-blue-600 text-white",
+                    onConfirm: () => proceedOpenFolderEntry(entry)
+                });
+                return;
+            }
+
+            proceedOpenFolderEntry(entry);
+        }
+
+        async function proceedOpenFolderEntry(entry) {
+            try {
+                let text = "";
+
+                if (entry.kind === "directoryAPI") {
+                    const file = await entry.handle.getFile();
+                    text = await file.text();
+                    currentFileHandle = entry.handle;
+                } else {
+                    text = await entry.file.text();
+                    currentFileHandle = null;
+                }
+
+                clearTimeout(autoSaveTimer);
+
+                currentNoteId = null;
+                activeFolderEntry = entry;
+                currentFileName = sanitizeFileName(entry.name);
+
+                updateFileNameDisplay();
+                editor.value = text;
+
+                fileHandleStatus.textContent = entry.kind === "directoryAPI"
+                    ? `${currentDirName}/${entry.path}`
+                    : `${currentDirName}/${entry.path} (view only — use Save to export)`;
+
+                setDirtyState(false);
+                updateStats();
+                renderFolderFilesList();
+                renderNotesList();
+
+                if (window.innerWidth < 768) {
+                    toggleSidebar(false);
+                }
+            } catch (error) {
+                console.error("Failed to open file from folder:", error);
+
+                showModal({
+                    title: "Could Not Open File",
+                    subtitle: entry.name,
+                    content: "This file could not be read. It may have been moved or deleted, or permission may need to be granted again.",
+                    confirmText: "Understood",
+                    showCancel: false,
+                    iconClass: "fa-solid fa-triangle-exclamation text-red-500",
+                    confirmBtnClass: "bg-red-600 hover:bg-red-700 text-white"
+                });
+            }
+        }
+
+        async function openFolder() {
+            if (supportsDirectoryPicker) {
+                try {
+                    let dirHandle;
+
+                    try {
+                        // Ask for read/write up front so files can be saved back in place.
+                        dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+                    } catch (permissionError) {
+                        // Some browsers reject the "mode" option outright — fall back to read-only.
+                        dirHandle = await window.showDirectoryPicker();
+                    }
+
+                    const entries = await collectDirEntries(dirHandle, "");
+                    showFolderEntries(dirHandle.name, entries);
+                } catch (error) {
+                    if (error.name !== "AbortError") {
+                        console.warn("Folder open failed:", error);
+
+                        showModal({
+                            title: "Could Not Open Folder",
+                            subtitle: "Folder access failed",
+                            content: "This folder could not be opened. Permission may have been denied, or your browser may not fully support folder access.",
+                            confirmText: "Understood",
+                            showCancel: false,
+                            iconClass: "fa-solid fa-triangle-exclamation text-red-500",
+                            confirmBtnClass: "bg-red-600 hover:bg-red-700 text-white"
+                        });
+                    }
+                }
+
+                return;
+            }
+
+            // Fallback for browsers without the File System Access API
+            // (common on many mobile browsers): use a hidden directory input.
+            folderInputFallback.click();
+        }
+
+        openFolderBtn.addEventListener("click", openFolder);
+
+        folderInputFallback.addEventListener("change", event => {
+            const files = Array.from(event.target.files || []);
+            folderInputFallback.value = "";
+
+            if (files.length === 0) {
+                return;
+            }
+
+            const firstPath = files[0].webkitRelativePath || files[0].name;
+            const rootName = firstPath.split("/")[0] || "Folder";
+
+            const entries = files
+                .filter(file => !file.name.startsWith("."))
+                .map(file => {
+                    const relativePath = file.webkitRelativePath || file.name;
+                    const path = relativePath.includes("/")
+                        ? relativePath.substring(relativePath.indexOf("/") + 1)
+                        : relativePath;
+
+                    return { path: path || relativePath, name: file.name, file, kind: "inputFallback" };
+                })
+                .filter(entry => !entry.path.split("/").some(part => SKIP_ENTRY_NAMES.has(part)));
+
+            showFolderEntries(rootName, entries);
+        });
+
+        closeFolderBtn.addEventListener("click", () => {
+            currentDirName = "";
+            openFolderEntries = [];
+            activeFolderEntry = null;
+
+            folderSection.classList.add("hidden");
+            folderFilesList.innerHTML = "";
+        });
+
+        /* =========================================================
+           STATS & DIRTY STATE
+        ========================================================= */
+
+        function updateStats() {
+            const text = editor.value;
+
+            const chars = text.length;
+            const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+
+            wordCountDisplay.textContent = `Words: ${words}`;
+            charCountDisplay.textContent = `Chars: ${chars}`;
+        }
+
+        function setDirtyState(dirty) {
+            isDirty = dirty;
+
+            if (dirty) {
+                unsavedIndicator.classList.remove("hidden");
+            } else {
+                unsavedIndicator.classList.add("hidden");
+            }
+        }
+
+        /* =========================================================
+           AUTO-SAVE
+        ========================================================= */
+
+        function scheduleAutoSave() {
+            clearTimeout(autoSaveTimer);
+
+            autoSaveTimer = setTimeout(() => {
+                autoSaveCache();
+            }, 500);
+        }
+
+        function autoSaveCache() {
+            // Do not auto-save while the app is initializing.
+            if (isInitializing) {
+                return;
+            }
+
+            // Files opened from a folder already live on disk; don't duplicate
+            // them into the browser's local "Saved Notes" cache.
+            if (activeFolderEntry) {
+                return;
+            }
+
+            // Do not create a saved note for a completely empty editor.
+            // This prevents deletion from immediately recreating a note.
+            if (!currentNoteId && editor.value.trim() === "") {
+                return;
+            }
+
+            if (!currentNoteId) {
+                currentNoteId = "note_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+            }
+
+            const notes = getSavedNotes();
+            const existingIndex = notes.findIndex(note => note.id === currentNoteId);
+
+            const noteObject = {
+                id: currentNoteId,
+                name: currentFileName,
+                content: editor.value,
+                updatedAt: Date.now()
+            };
+
+            if (existingIndex >= 0) {
+                notes[existingIndex] = noteObject;
+            } else {
+                notes.unshift(noteObject);
+            }
+
+            if (writeNotes(notes)) {
+                renderNotesList();
+            }
+        }
+
+        editor.addEventListener("input", () => {
+            updateStats();
+
+            if (!isInitializing) {
+                setDirtyState(true);
+                scheduleAutoSave();
+            }
+        });
+
+        // Hide the on-screen keyboard right after a paste so pasted code
+        // (often large) doesn't leave the keyboard covering half the screen.
+        // Tapping the editor again focuses it and brings the keyboard back.
+        editor.addEventListener("paste", () => {
+            setTimeout(() => {
+                editor.blur();
+            }, 0);
+        });
+
+        /* =========================================================
+           INSERT TEXT
+        ========================================================= */
+
+        function getInsertText(type) {
+            if (type === "boilerplate") {
+                return `<!DOCTYPE html>
+<html>
+<head>
+    <title>Page</title>
+</head>
+<body>
+    
+</body>
+</html>`;
+            }
+
+            if (type === "div") {
+                return `<div class="">
+    
+</div>`;
+            }
+
+            if (type === "script") {
+                return `<script>
+    
+<\/script>`;
+            }
+
+            if (type === "style") {
+                return `<style>
+    
+<\/style>`;
+            }
+
+            if (type === "class") {
+                return `class=""`;
+            }
+
+            return type;
+        }
+
+        function insertText(textToInsert) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const value = editor.value;
+
+            editor.value =
+                value.substring(0, start) +
+                textToInsert +
+                value.substring(end);
+
+            editor.selectionStart = editor.selectionEnd = start + textToInsert.length;
+
+            editor.focus();
+
+            updateStats();
+            setDirtyState(true);
+            scheduleAutoSave();
+        }
+
+        document.querySelectorAll(".quick-insert").forEach(button => {
+            button.addEventListener("click", () => {
+                insertText(getInsertText(button.dataset.insert));
+            });
+        });
+
+        /* =========================================================
+           LOAD NOTE
+        ========================================================= */
+
+        function loadNote(id) {
+            const notes = getSavedNotes();
+            const note = notes.find(item => item.id === id);
+
+            if (!note) {
+                return;
+            }
+
+            if (isDirty && editor.value.trim() !== "") {
+                showModal({
+                    title: "Switch Note?",
+                    subtitle: "Unsaved modifications",
+                    content: "You have unsaved changes in your current note. Do you want to switch without saving?",
+                    confirmText: "Switch",
+                    confirmBtnClass: "bg-primary hover:bg-blue-600 text-white",
+                    onConfirm: () => proceedLoad(note)
+                });
+                return;
+            }
+
+            proceedLoad(note);
+        }
+
+        function proceedLoad(note) {
+            currentNoteId = note.id;
+            currentFileName = sanitizeFileName(note.name || "index.html");
+
+            updateFileNameDisplay();
+
+            editor.value = note.content || "";
+            currentFileHandle = null;
+            activeFolderEntry = null;
+
+            fileHandleStatus.textContent = "Local Storage Cache";
+
+            setDirtyState(false);
+            updateStats();
+            renderNotesList();
+            renderFolderFilesList();
+
+            if (window.innerWidth < 768) {
+                toggleSidebar(false);
+            }
+        }
+
+        /* =========================================================
+           DELETE NOTE
+        ========================================================= */
+
+        function deleteNotePrompt(id, name) {
+            showModal({
+                title: "Delete Note",
+                subtitle: name,
+                content: `Are you sure you want to permanently delete "<b>${escapeHtml(name)}</b>" from your stored notes?`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                showCancel: true,
+                iconClass: "fa-solid fa-triangle-exclamation text-red-500",
+                confirmBtnClass: "bg-red-600 hover:bg-red-700 text-white",
+                onConfirm: () => deleteNote(id)
+            });
+        }
+
+        function deleteNote(id) {
+            const notes = getSavedNotes();
+            const noteToDelete = notes.find(note => note.id === id);
+
+            if (!noteToDelete) {
+                renderNotesList();
+                return;
+            }
+
+            const remainingNotes = notes.filter(note => note.id !== id);
+
+            if (!writeNotes(remainingNotes)) {
+                return;
+            }
+
+            // If deleting an inactive note, leave the editor untouched.
+            if (currentNoteId !== id) {
+                renderNotesList();
+                return;
+            }
+
+            // If deleting the active note, cancel any pending autosave.
+            clearTimeout(autoSaveTimer);
+
+            // Load another existing note if available.
+            if (remainingNotes.length > 0) {
+                const nextNote = remainingNotes[0];
+
+                currentNoteId = nextNote.id;
+                currentFileName = sanitizeFileName(nextNote.name || "index.html");
+                currentFileHandle = null;
+                activeFolderEntry = null;
+
+                editor.value = nextNote.content || "";
+
+                updateFileNameDisplay();
+                fileHandleStatus.textContent = "Local Storage Cache";
+                setDirtyState(false);
+                updateStats();
+            } else {
+                // IMPORTANT:
+                // Do not call newFile() here.
+                // That would create and auto-save a replacement note.
+                currentNoteId = null;
+                currentFileHandle = null;
+                activeFolderEntry = null;
+                currentFileName = "index.html";
+
+                editor.value = "";
+
+                updateFileNameDisplay();
+                fileHandleStatus.textContent = "No Saved Notes";
+                setDirtyState(false);
+                updateStats();
+            }
+
+            renderNotesList();
+            renderFolderFilesList();
+        }
+
+        /* =========================================================
+           NEW NOTE
+        ========================================================= */
+
+        function newFile() {
+            if (isDirty && editor.value.trim() !== "") {
+                showModal({
+                    title: "Create New Note?",
+                    subtitle: "Unsaved modifications",
+                    content: "Your current file has unsaved changes. Create a new note anyway?",
+                    confirmText: "New Note",
+                    cancelText: "Cancel",
+                    showCancel: true,
+                    iconClass: "fa-solid fa-circle-info text-blue-500",
+                    confirmBtnClass: "bg-primary hover:bg-blue-600 text-white",
+                    onConfirm: proceedNewFile
+                });
+                return;
+            }
+
+            proceedNewFile();
+        }
+
+        function proceedNewFile() {
+            clearTimeout(autoSaveTimer);
+
+            const enteredName = prompt(
+                "Filename for the new note (e.g. index.html, script.js, notes.txt):",
+                "index.html"
+            );
+
+            if (!enteredName || enteredName.trim() === "") {
+                return;
+            }
+
+            currentNoteId = null;
+            currentFileHandle = null;
+            activeFolderEntry = null;
+
+            currentFileName = sanitizeFileName(enteredName);
+
+            updateFileNameDisplay();
+
+            fileHandleStatus.textContent = "New Local File";
+
+            // The starting template is decided purely by the extension
+            // actually typed in the filename — nothing else governs this.
+            const lowerName = currentFileName.toLowerCase();
+            editor.value = (lowerName.endsWith(".html") || lowerName.endsWith(".htm"))
+                ? DEFAULT_HTML
+                : "";
+
+            setDirtyState(false);
+            updateStats();
+
+            // Do not save immediately.
+            // The note will be saved once the user types or inserts content.
+            renderNotesList();
+            renderFolderFilesList();
+
+            if (window.innerWidth < 768) {
+                toggleSidebar(false);
+            }
+
+            editor.focus();
+        }
+
+        newBtn.addEventListener("click", event => {
+            event.preventDefault();
+            newFile();
+        });
+
+        /* =========================================================
+           RENAME
+        ========================================================= */
+
+        function promptRenameFile() {
+            const enteredName = prompt(
+                "Enter new filename (e.g. index.html, script.js, notes.txt):",
+                currentFileName
+            );
+
+            if (!enteredName || enteredName.trim() === "") {
+                return;
+            }
+
+            const newName = sanitizeFileName(enteredName);
+
+            if (!newName) {
+                return;
+            }
+
+            currentFileName = newName;
+            updateFileNameDisplay();
+
+            // If the current note already exists, update its name.
+            if (currentNoteId) {
+                const notes = getSavedNotes();
+                const index = notes.findIndex(note => note.id === currentNoteId);
+
+                if (index >= 0) {
+                    notes[index].name = currentFileName;
+                    notes[index].updatedAt = Date.now();
+                    writeNotes(notes);
+                }
+            }
+
+            renderNotesList();
+        }
+
+        fileNameDisplay.addEventListener("click", promptRenameFile);
+
+        /* =========================================================
+           FILE TYPE
+           (extension is always read directly from the filename —
+           no separate type selector exists anymore.)
+        ========================================================= */
+
+        /* =========================================================
+           SAVE FILE TO DEVICE
+        ========================================================= */
+
+        function getMimeType(fileName) {
+            const name = fileName.toLowerCase();
+
+            if (name.endsWith(".html") || name.endsWith(".htm")) {
+                return "text/html";
+            }
+
+            if (name.endsWith(".css")) {
+                return "text/css";
+            }
+
+            if (name.endsWith(".js")) {
+                return "text/javascript";
+            }
+
+            if (name.endsWith(".json")) {
+                return "application/json";
+            }
+
+            if (name.endsWith(".md")) {
+                return "text/markdown";
+            }
+
+            return "text/plain";
+        }
+
+        async function trySaveToHandle(handle) {
+            try {
+                if (typeof handle.queryPermission === "function") {
+                    let permission = await handle.queryPermission({ mode: "readwrite" });
+
+                    if (permission !== "granted" && typeof handle.requestPermission === "function") {
+                        permission = await handle.requestPermission({ mode: "readwrite" });
+                    }
+
+                    if (permission !== "granted") {
+                        return false;
+                    }
+                }
+
+                const writable = await handle.createWritable();
+                await writable.write(editor.value);
+                await writable.close();
+
+                return true;
+            } catch (error) {
+                console.warn("Direct save to file handle failed:", error);
+                return false;
+            }
+        }
+
+        async function saveAsFile(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            clearTimeout(autoSaveTimer);
+
+            // Files opened from a folder (or previously saved via the picker)
+            // already have a writable handle — save straight back to them.
+            if (currentFileHandle && typeof currentFileHandle.createWritable === "function") {
+                const saved = await trySaveToHandle(currentFileHandle);
+
+                if (saved) {
+                    currentFileName = sanitizeFileName(currentFileHandle.name);
+                    updateFileNameDisplay();
+
+                    fileHandleStatus.textContent = activeFolderEntry
+                        ? `${currentDirName}/${activeFolderEntry.path}`
+                        : "Saved to Device";
+
+                    setDirtyState(false);
+                    renderNotesList();
+                    renderFolderFilesList();
+                    return;
+                }
+                // If the direct write failed (e.g. permission revoked), fall through
+                // to the picker/download flow below.
+            }
+
+            // Ensure the latest content is cached before exporting.
+            autoSaveCache();
+
+            if (window.showSaveFilePicker) {
+                // Step 1: the actual file write. ONLY this part decides whether
+                // we fall back to the download method — a failure here means
+                // the file picker/write itself didn't work.
+                let handle = null;
+
+                try {
+                    // Only offer ONE type — the one matching the current file's
+                    // extension. Some Android browsers collapse a list of accepted
+                    // formats down into a single system-level MIME type for their
+                    // underlying save dialog, and can pick the wrong one out of
+                    // several options (stamping on an unrelated extension, e.g.
+                    // "index.html.json"). Giving it just one option removes any
+                    // ambiguity for that resolution step.
+                    const knownTypes = [
+                        { description: "HTML File", accept: { "text/html": [".html", ".htm"] } },
+                        { description: "Text File", accept: { "text/plain": [".txt", ".md"] } },
+                        { description: "JavaScript File", accept: { "text/javascript": [".js"] } },
+                        { description: "CSS File", accept: { "text/css": [".css"] } },
+                        { description: "JSON File", accept: { "application/json": [".json"] } }
+                    ];
+
+                    const lowerName = currentFileName.toLowerCase();
+                    const matched = knownTypes.find(t =>
+                        Object.values(t.accept)[0].some(ext => lowerName.endsWith(ext))
+                    );
+
+                    const opts = {
+                        suggestedName: currentFileName,
+                        types: matched ? [matched] : []
+                    };
+
+                    handle = await window.showSaveFilePicker(opts);
+                    const writable = await handle.createWritable();
+
+                    await writable.write(editor.value);
+                    await writable.close();
+
+                    // Some browsers/apps implement a broken or partial version of
+                    // this API: the folder dialog appears and "succeeds", but the
+                    // write never actually lands (resulting in a 0-byte file, or
+                    // one saved with the wrong extension). Read the file back to
+                    // confirm the content is really there before trusting this path.
+                    const expectedLength = editor.value.length;
+
+                    if (expectedLength > 0) {
+                        const savedFile = await handle.getFile();
+
+                        if (savedFile.size === 0) {
+                            throw new Error(
+                                "Write verification failed: file is empty after save " +
+                                "(this browser's folder-save support appears broken)."
+                            );
+                        }
+                    }
+
+                } catch (error) {
+                    if (error.name === "AbortError") {
+                        return;
+                    }
+
+                    console.warn("File picker unavailable or failed:", error);
+                    handle = null;
+                    // Fall through to the download fallback below — the write
+                    // genuinely didn't happen (or couldn't be verified).
+                }
+
+                // Step 2: the file was actually written successfully. Everything
+                // from here on is just UI/bookkeeping — if any of it throws, we
+                // log it but we must NOT fall through to the download fallback,
+                // since that would silently create a duplicate save.
+                if (handle) {
+                    try {
+                        currentFileHandle = handle;
+                        currentFileName = sanitizeFileName(handle.name);
+                        activeFolderEntry = null;
+
+                        updateFileNameDisplay();
+
+                        fileHandleStatus.textContent = "Saved to Device";
+                        setDirtyState(false);
+
+                        // Update cached note name after save.
+                        if (currentNoteId) {
+                            const notes = getSavedNotes();
+                            const index = notes.findIndex(note => note.id === currentNoteId);
+
+                            if (index >= 0) {
+                                notes[index].name = currentFileName;
+                                notes[index].content = editor.value;
+                                notes[index].updatedAt = Date.now();
+                                writeNotes(notes);
+                            }
+                        }
+
+                        renderNotesList();
+                    } catch (postSaveError) {
+                        // The file is already safely saved to disk at this point.
+                        // A UI/bookkeeping glitch here should never trigger a
+                        // second, duplicate download.
+                        console.error("Post-save UI update failed (file was still saved):", postSaveError);
+                    }
+
+                    return;
+                }
+            }
+
+            // Browser download fallback.
+            const blob = new Blob([editor.value], {
+                type: `${getMimeType(currentFileName)};charset=utf-8`
+            });
+
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+
+            anchor.href = url;
+            anchor.download = currentFileName;
+
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+
+            URL.revokeObjectURL(url);
+
+            activeFolderEntry = null;
+            fileHandleStatus.textContent = "Saved to Downloads";
+            setDirtyState(false);
+
+            renderNotesList();
+            renderFolderFilesList();
+        }
+
+        saveAsBtn.addEventListener("click", saveAsFile);
+
+        window.addEventListener("keydown", event => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+                event.preventDefault();
+                saveAsFile();
+            }
+        });
+
+        /* =========================================================
+           SAVE LOCATION HELP
+        ========================================================= */
+
+        function showSaveLocationHelp() {
+            showModal({
+                title: "Where are files saved?",
+                subtitle: "Accessing your saved files",
+                content: `Depending on how your browser handles saving:<br><br>
+                    1. <b>File Picker:</b> If your browser opens a file picker and you choose a folder, the file is saved in that selected location.<br><br>
+                    2. <b>Downloads:</b> If the browser downloads the file directly, it is usually placed in your device's default <b>Downloads</b> folder.<br><br>
+                    3. <b>Saved Notes:</b> Notes shown in the sidebar are stored in your browser's local storage. They are not automatically the same as files saved to your device.`,
+                confirmText: "Understood",
+                showCancel: false,
+                iconClass: "fa-solid fa-folder-open text-blue-500",
+                confirmBtnClass: "bg-primary hover:bg-blue-600 text-white"
+            });
+        }
+
+        saveLocationHelpBtn.addEventListener("click", showSaveLocationHelp);
+
+        /* =========================================================
+           HARD REFRESH
+        ========================================================= */
+
+        function hardRefreshApp() {
+            showModal({
+                title: "Reload App",
+                subtitle: "Refresh the application",
+                content: "The app will reload. Your saved notes in browser storage will remain intact. This does not clear your browser's entire cache.",
+                confirmText: "Reload Now",
+                cancelText: "Cancel",
+                showCancel: true,
+                iconClass: "fa-solid fa-rotate text-primary",
+                confirmBtnClass: "bg-primary hover:bg-blue-600 text-white",
+                onConfirm: () => {
+                    window.location.reload();
+                }
+            });
+        }
+
+        hardRefreshBtn.addEventListener("click", hardRefreshApp);
+
+        /* =========================================================
+           HTML ESCAPE
+        ========================================================= */
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        /* =========================================================
+           INITIALIZATION
+        ========================================================= */
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const notes = getSavedNotes();
+
+            if (notes.length > 0) {
+                proceedLoad(notes[0]);
+            } else {
+                // Start with a new editor, but do not save it automatically.
+                currentNoteId = null;
+                currentFileName = "index.html";
+                currentFileHandle = null;
+
+                updateFileNameDisplay();
+
+                fileHandleStatus.textContent = "New Local File";
+                editor.value = DEFAULT_HTML;
+
+                setDirtyState(false);
+                updateStats();
+            }
+
+            renderNotesList();
+
+            // Initialization is complete.
+            isInitializing = false;
+        });
+
+        window.addEventListener("beforeunload", () => {
+            previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+        });
+    </script>
+</body>
+</html>
